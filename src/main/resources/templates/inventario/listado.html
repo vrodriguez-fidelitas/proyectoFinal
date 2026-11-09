@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/plantilla :: head}"></head>
+    <body class="d-flex">
+        <div th:replace="~{layout/plantilla :: sidebar('inventario')}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout/plantilla :: topbar('Gestión de Inventario')}"></header>
+
+            <main class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Inventario General</h4>
+                        <p class="text-muted small mb-0">Control de bicicletas disponibles y componentes/accesorios.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalBicicleta">
+                            <i class="fa-solid fa-bicycle me-1"></i> Nueva Bicicleta (HU-02)
+                        </button>
+                        <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalAccesorio">
+                            <i class="fa-solid fa-puzzle-piece me-1"></i> Nuevo Componente (HU-03)
+                        </button>
+                    </div>
+                </div>
+
+                <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${exito}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- TABLA BICICLETAS (HU-02) -->
+                <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-bicycle me-2 text-primary"></i>Bicicletas Disponibles para Venta</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle text-secondary mb-0">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>N° Serie</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Talla</th>
+                                    <th>Tipo</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="b : ${bicicletas}">
+                                    <td class="fw-bold text-dark" th:text="${b.numeroSerie}">SN-001</td>
+                                    <td th:text="${b.marca}">Marca</td>
+                                    <td class="text-dark fw-semibold" th:text="${b.modelo}">Modelo</td>
+                                    <td th:text="${b.talla}">M</td>
+                                    <td th:text="${b.tipo}">Tipo</td>
+                                    <td class="text-dark fw-bold">₡ [[${b.precio}]]</td>
+                                    <td><span class="badge-completada">Disponible</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TABLA ACCESORIOS (HU-03) -->
+                <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>Componentes y Accesorios</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle text-secondary mb-0">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>#</th>
+                                    <th>Descripción</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a, i : ${accesorios}">
+                                    <td th:text="${i.count}">1</td>
+                                    <td class="text-dark fw-semibold" th:text="${a.descripcion}">Accesorio</td>
+                                    <td><span class="badge bg-light text-dark border" th:text="${a.categoria.nombre}">Cat</span></td>
+                                    <td class="text-dark fw-bold">₡ [[${a.precio}]]</td>
+                                    <td><span class="fw-bold text-dark" th:text="${a.cantidad}">10</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- MODAL BICICLETA -->
+        <div class="modal fade" id="modalBicicleta" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content border-0 shadow">
+                    <form th:action="@{/inventario/bicicleta/guardar}" method="POST" th:object="${bicicleta}">
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold">Registrar Bicicleta</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Número de Serie (Único)</label>
+                                <input type="text" class="form-control" th:field="*{numeroSerie}" required/>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Marca</label>
+                                    <input type="text" class="form-control" th:field="*{marca}" required/>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Modelo</label>
+                                    <input type="text" class="form-control" th:field="*{modelo}" required/>
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Talla</label>
+                                    <select class="form-select" th:field="*{talla}" required>
+                                        <option value="S">S</option>
+                                        <option value="M" selected>M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Tipo</label>
+                                    <input type="text" class="form-control" th:field="*{tipo}" required/>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Precio (₡)</label>
+                                <input type="number" step="0.01" min="1" class="form-control" th:field="*{precio}" required/>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL ACCESORIO -->
+        <div class="modal fade" id="modalAccesorio" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content border-0 shadow">
+                    <form th:action="@{/inventario/accesorio/guardar}" method="POST" th:object="${accesorio}">
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold">Registrar Componente o Accesorio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Descripción</label>
+                                <input type="text" class="form-control" th:field="*{descripcion}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Categoría</label>
+                                <select class="form-select" th:field="*{categoria.idCategoria}" required>
+                                    <option th:each="cat : ${categorias}" th:value="${cat.idCategoria}" th:text="${cat.nombre}"></option>
+                                </select>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Precio (₡)</label>
+                                    <input type="number" step="0.01" min="1" class="form-control" th:field="*{precio}" required/>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Cantidad</label>
+                                    <input type="number" min="0" class="form-control" th:field="*{cantidad}" required/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script th:replace="~{layout/plantilla :: scripts}"></script>
+    </body>
+</html>
