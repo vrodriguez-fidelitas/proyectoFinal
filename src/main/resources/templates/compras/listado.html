@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/plantilla :: head}"></head>
+    <body class="d-flex">
+        <div th:replace="~{layout/plantilla :: sidebar('compras')}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout/plantilla :: topbar('Compras a Proveedores')}"></header>
+
+            <main class="p-4">
+                <h4 class="fw-bold mb-1">Compras a proveedores</h4>
+                <p class="text-muted small mb-4">
+                    Registra los productos recibidos de los proveedores para aumentar las existencias (HU-08).
+                </p>
+
+                <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${exito}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                    <h6 class="fw-bold mb-3">Nueva compra</h6>
+
+                    <form th:action="@{/compras}" method="post">
+
+                        <div class="mb-3 col-md-6 px-0">
+                            <label class="form-label small fw-semibold">Proveedor</label>
+                            <select name="proveedorId" class="form-select" required>
+                                <option value="">Seleccionar proveedor</option>
+                                <option th:each="p : ${proveedores}"
+                                        th:value="${p.idProveedor}"
+                                        th:text="${p.nombre}"></option>
+                            </select>
+                        </div>
+
+                        <label class="form-label small fw-semibold">Productos recibidos</label>
+
+                        <div id="lineas">
+                            <div class="row g-2 mb-2 linea">
+                                <div class="col-md-6">
+                                    <select name="accesorioId" class="form-select" required>
+                                        <option value="">Seleccionar producto</option>
+                                        <option th:each="a : ${accesorios}"
+                                                th:value="${a.idAccesorio}"
+                                                th:text="${a.descripcion + ' - Existencias: ' + a.cantidad}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="cantidad" min="1" value="1"
+                                           class="form-control" placeholder="Cantidad" required/>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="costo" min="0.01" step="0.01"
+                                           class="form-control" placeholder="Costo unitario (₡)" required/>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                                            onclick="quitarLinea(this)">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarLinea()">
+                                <i class="fa-solid fa-plus me-1"></i> Agregar otro producto
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">
+                                Registrar compra
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <h6 class="fw-bold mb-3">Historial de compras</h6>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle text-secondary mb-0">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>Número</th>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>Total</th>
+                                    <th>Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${compras}">
+                                    <td th:text="${c.id}"></td>
+                                    <td th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td class="text-dark fw-semibold" th:text="${c.proveedor.nombre}"></td>
+                                    <td class="fw-bold text-dark" th:text="${'₡' + c.total}"></td>
+                                    <td>
+                                        <a class="btn btn-outline-primary btn-sm"
+                                           th:href="@{/compras/{id}(id=${c.id})}">
+                                            Ver detalle
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(compras)}">
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        Todavía no hay compras registradas.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <script th:replace="~{layout/plantilla :: scripts}"></script>
+
+        <script>
+            function agregarLinea() {
+                const lineas = document.getElementById('lineas');
+                const nueva = lineas.querySelector('.linea').cloneNode(true);
+                nueva.querySelector('select').value = '';
+                nueva.querySelector('input[name="cantidad"]').value = 1;
+                nueva.querySelector('input[name="costo"]').value = '';
+                lineas.appendChild(nueva);
+            }
+
+            function quitarLinea(boton) {
+                const lineas = document.getElementById('lineas');
+                if (lineas.querySelectorAll('.linea').length > 1) {
+                    boton.closest('.linea').remove();
+                }
+            }
+        </script>
+    </body>
+</html>

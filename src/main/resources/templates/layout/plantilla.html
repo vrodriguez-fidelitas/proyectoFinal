@@ -215,20 +215,24 @@
                 </a>
             </li>
 
-            <!-- COMPRAS -->
+                       <!-- COMPRAS HU-08 -->
             <li class="nav-item">
 
-                <a href="#" class="nav-link">
+                <a th:href="@{/compras}"
+                   class="nav-link"
+                   th:classappend="${activeTab == 'compras'} ? 'active' : ''">
 
                     <i class="fa-solid fa-truck"></i>
                     Compras
                 </a>
             </li>
 
-            <!-- PROVEEDORES -->
+                        <!-- PROVEEDORES HU-07 -->
             <li class="nav-item">
 
-                <a href="#" class="nav-link">
+                <a th:href="@{/proveedor/listado}"
+                   class="nav-link"
+                   th:classappend="${activeTab == 'proveedores'} ? 'active' : ''">
 
                     <i class="fa-solid fa-handshake"></i>
                     Proveedores

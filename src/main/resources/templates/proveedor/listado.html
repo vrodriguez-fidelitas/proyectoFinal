@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/plantilla :: head}"></head>
+    <body class="d-flex">
+        <div th:replace="~{layout/plantilla :: sidebar('proveedores')}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout/plantilla :: topbar('Gestión de Proveedores')}"></header>
+
+            <main class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Proveedores Registrados</h4>
+                        <p class="text-muted small mb-0">Control de los proveedores que abastecen el negocio (HU-07).</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm px-3 shadow-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalProveedor" onclick="nuevoProveedor()">
+                        <i class="fa-solid fa-handshake me-1"></i> Registrar Proveedor
+                    </button>
+                </div>
+
+                <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${exito}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <div class="table-responsive">
+                        <table class="table align-middle text-secondary mb-0">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Dirección</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p, i : ${proveedores}">
+                                    <td th:text="${i.count}">1</td>
+                                    <td class="fw-bold text-dark" th:text="${p.nombre}">Distribuidora Bike</td>
+                                    <td th:text="${p.telefono}">2222-3333</td>
+                                    <td th:text="${p.correo}">ventas@bike.com</td>
+                                    <td th:text="${p.direccion}">San José</td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#modalProveedor"
+                                                onclick="editarProveedor(this)"
+                                                th:attr="data-id=${p.idProveedor},data-nombre=${p.nombre},data-telefono=${p.telefono},data-correo=${p.correo},data-direccion=${p.direccion}">
+                                            <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(proveedores)}">
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        No hay proveedores registrados.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- MODAL PARA REGISTRAR O EDITAR PROVEEDOR -->
+        <div class="modal fade" id="modalProveedor" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content border-0 shadow">
+                    <form th:action="@{/proveedor/guardar}" method="POST">
+                        <input type="hidden" name="idProveedor" id="idProveedor"/>
+
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="tituloModal">Nuevo Proveedor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Nombre del Proveedor</label>
+                                <input type="text" class="form-control" name="nombre" id="nombre" required
+                                       placeholder="Ej: Distribuidora Bike"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Teléfono</label>
+                                <input type="text" class="form-control" name="telefono" id="telefono" required
+                                       placeholder="Ej: 2222-3333"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Correo Electrónico</label>
+                                <input type="email" class="form-control" name="correo" id="correo" required
+                                       placeholder="Ej: ventas@proveedor.com"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Dirección</label>
+                                <input type="text" class="form-control" name="direccion" id="direccion" required
+                                       placeholder="Ej: 200 m norte de la iglesia, Alajuela"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">Guardar Proveedor</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script th:replace="~{layout/plantilla :: scripts}"></script>
+
+        <script>
+            function nuevoProveedor() {
+                document.getElementById('idProveedor').value = '';
+                document.getElementById('nombre').value = '';
+                document.getElementById('telefono').value = '';
+                document.getElementById('correo').value = '';
+                document.getElementById('direccion').value = '';
+                document.getElementById('tituloModal').textContent = 'Nuevo Proveedor';
+            }
+
+            function editarProveedor(boton) {
+                document.getElementById('idProveedor').value = boton.dataset.id;
+                document.getElementById('nombre').value = boton.dataset.nombre;
+                document.getElementById('telefono').value = boton.dataset.telefono;
+                document.getElementById('correo').value = boton.dataset.correo;
+                document.getElementById('direccion').value = boton.dataset.direccion;
+                document.getElementById('tituloModal').textContent = 'Editar Proveedor';
+            }
+        </script>
+    </body>
+</html>
