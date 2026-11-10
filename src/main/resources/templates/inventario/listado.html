@@ -1,0 +1,515 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body class="d-flex">
+
+    <div th:replace=
+         "~{layout/plantilla :: sidebar('inventario')}">
+    </div>
+
+    <div class="main-content">
+
+        <header th:replace=
+                "~{layout/plantilla :: topbar('Gestión de Inventario')}">
+        </header>
+
+        <main class="p-4">
+
+            <!-- ENCABEZADO -->
+            <div class="d-flex justify-content-between
+                        align-items-center mb-4">
+
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        Inventario General
+                    </h4>
+
+                    <p class="text-muted small mb-0">
+                        Consulta la disponibilidad de
+                        bicicletas, componentes y accesorios.
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button class="btn btn-outline-primary btn-sm px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalBicicleta">
+
+                        <i class="fa-solid fa-bicycle me-1"></i>
+                        Nueva Bicicleta (HU-02)
+                    </button>
+
+                    <button class="btn btn-primary btn-sm px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalAccesorio">
+
+                        <i class="fa-solid fa-puzzle-piece me-1"></i>
+                        Nuevo Componente (HU-03)
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- MENSAJES -->
+            <div th:if="${exito}"
+                 class="alert alert-success alert-dismissible fade show">
+
+                <span th:text="${exito}"></span>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+            </div>
+
+            <div th:if="${error}"
+                 class="alert alert-danger alert-dismissible fade show">
+
+                <span th:text="${error}"></span>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+            </div>
+
+            <!-- INVENTARIO DE BICICLETAS -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-3">
+
+                    <h6 class="fw-bold mb-0">
+                        <i class="fa-solid fa-bicycle
+                                  me-2 text-primary"></i>
+                        Inventario de Bicicletas
+                    </h6>
+
+                    <span class="badge bg-primary">
+                        HU-04
+                    </span>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle
+                                  text-secondary mb-0">
+
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>N° Serie</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Talla</th>
+                                <th>Tipo</th>
+                                <th>Precio</th>
+                                <th>Disponibilidad</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="b : ${bicicletas}">
+
+                                <td class="fw-bold text-dark"
+                                    th:text="${b.numeroSerie}">
+                                </td>
+
+                                <td th:text="${b.marca}"></td>
+
+                                <td class="text-dark fw-semibold"
+                                    th:text="${b.modelo}">
+                                </td>
+
+                                <td th:text="${b.talla}"></td>
+
+                                <td th:text="${b.tipo}"></td>
+
+                                <td class="text-dark fw-bold"
+                                    th:text="${'₡ ' + b.precio}">
+                                </td>
+
+                                <td>
+                                    <span th:if="${b.disponible}"
+                                          class="badge-completada">
+                                        Disponible
+                                    </span>
+
+                                    <span th:unless="${b.disponible}"
+                                          class="badge bg-danger">
+                                        Vendida
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(bicicletas)}">
+                                <td colspan="7"
+                                    class="text-center text-muted py-4">
+                                    No hay bicicletas registradas.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+            <!-- COMPONENTES Y ACCESORIOS -->
+            <div class="card border-0 shadow-sm rounded-3 p-4">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-3">
+
+                    <h6 class="fw-bold mb-0">
+
+                        <i class="fa-solid fa-boxes-stacked
+                                  me-2 text-primary"></i>
+
+                        Componentes y Accesorios
+                    </h6>
+
+                    <span class="badge bg-primary">
+                        HU-04
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle
+                                  text-secondary mb-0">
+
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>#</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Existencias</th>
+                                <th>Disponibilidad</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="a, i : ${accesorios}">
+
+                                <td th:text="${i.count}"></td>
+
+                                <td class="text-dark fw-semibold"
+                                    th:text="${a.descripcion}">
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-light
+                                                 text-dark border"
+                                          th:text="${a.categoria != null
+                                              ? a.categoria.nombre
+                                              : 'Sin categoría'}">
+                                    </span>
+                                </td>
+
+                                <td class="text-dark fw-bold"
+                                    th:text="${'₡ ' + a.precio}">
+                                </td>
+
+                                <td>
+                                    <span class="fw-bold"
+                                          th:text="${a.cantidad}">
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <span th:if="${a.cantidad > 0}"
+                                          class="badge-completada">
+                                        Disponible
+                                    </span>
+
+                                    <span th:unless="${a.cantidad > 0}"
+                                          class="badge bg-danger">
+                                        Agotado
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(accesorios)}">
+                                <td colspan="6"
+                                    class="text-center text-muted py-4">
+                                    No hay componentes o accesorios
+                                    registrados.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL PARA REGISTRAR BICICLETA -->
+    <div class="modal fade"
+         id="modalBicicleta"
+         tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content border-0 shadow">
+
+                <form th:action="@{/inventario/bicicleta/guardar}"
+                      method="POST"
+                      th:object="${bicicleta}">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title fw-bold">
+                            Registrar Bicicleta
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal">
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label class="form-label small fw-semibold">
+                                Número de Serie (Único)
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{numeroSerie}"
+                                   required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+
+                            <div class="col-6">
+
+                                <label class="form-label small fw-semibold">
+                                    Marca
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{marca}"
+                                       required>
+                            </div>
+
+                            <div class="col-6">
+
+                                <label class="form-label small fw-semibold">
+                                    Modelo
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{modelo}"
+                                       required>
+                            </div>
+
+                        </div>
+
+                        <div class="row g-2 mb-3">
+
+                            <div class="col-6">
+
+                                <label class="form-label small fw-semibold">
+                                    Talla
+                                </label>
+
+                                <select class="form-select"
+                                        th:field="*{talla}"
+                                        required>
+
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-6">
+
+                                <label class="form-label small fw-semibold">
+                                    Tipo
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{tipo}"
+                                       required>
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label small fw-semibold">
+                                Precio (₡)
+                            </label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   min="1"
+                                   class="form-control"
+                                   th:field="*{precio}"
+                                   required>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0">
+
+                        <button type="button"
+                                class="btn btn-light btn-sm"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-sm px-3">
+                            Guardar Bicicleta
+                        </button>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA REGISTRAR ACCESORIOS -->
+    <div class="modal fade"
+         id="modalAccesorio"
+         tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content border-0 shadow">
+
+                <form th:action="@{/inventario/accesorio/guardar}"
+                      method="POST"
+                      th:object="${accesorio}">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title fw-bold">
+                            Registrar Componente o Accesorio
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+
+                            <label class="form-label small fw-semibold">
+                                Descripción
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{descripcion}"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label small fw-semibold">
+                                Categoría
+                            </label>
+
+                            <select class="form-select"
+                                    th:field="*{categoria.idCategoria}"
+                                    required>
+
+                                <option th:each="cat : ${categorias}"
+                                        th:value="${cat.idCategoria}"
+                                        th:text="${cat.nombre}">
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+
+                            <div class="col-6">
+
+                                <label class="form-label small fw-semibold">
+                                    Precio (₡)
+                                </label>
+
+                                <input type="number"
+                                       step="0.01"
+                                       min="1"
+                                       class="form-control"
+                                       th:field="*{precio}"
+                                       required>
+                            </div>
+
+                            <div class="col-6">
+
+                                <label class="form-label small fw-semibold">
+                                    Cantidad
+                                </label>
+
+                                <input type="number"
+                                       min="0"
+                                       class="form-control"
+                                       th:field="*{cantidad}"
+                                       required>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0">
+
+                        <button type="button"
+                                class="btn btn-light btn-sm"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-sm px-3">
+                            Guardar Componente
+                        </button>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:replace=
+            "~{layout/plantilla :: scripts}">
+    </script>
+
+</body>
+</html>

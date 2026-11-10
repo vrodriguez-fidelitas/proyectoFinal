@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+
+<div class="d-flex">
+
+    <div th:replace=
+         "~{layout/plantilla :: sidebar('ventas')}">
+    </div>
+
+    <div class="main-content">
+
+        <header th:replace=
+                "~{layout/plantilla :: topbar('Registro de Ventas')}">
+        </header>
+
+        <main class="p-4">
+
+            <h3 class="fw-bold">
+                Registro de ventas
+            </h3>
+
+            <p class="text-secondary">
+                Registra las ventas de bicicletas,
+                componentes y accesorios.
+            </p>
+
+            <div th:if="${error}"
+                 class="alert alert-danger"
+                 th:text="${error}">
+            </div>
+
+            <div class="card p-4 mb-4">
+
+                <h5>Nueva venta</h5>
+
+                <form th:action="@{/ventas}"
+                      method="post"
+                      class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Cliente
+                        </label>
+
+                        <select name="clienteId"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                Seleccionar cliente
+                            </option>
+
+                            <option th:each="c : ${clientes}"
+                                    th:value="${c.idCliente}"
+                                    th:text="${c.nombre}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Tipo de producto
+                        </label>
+
+                        <select id="tipo"
+                                name="tipo"
+                                class="form-select"
+                                onchange="filtrarProductos()">
+
+                            <option value="BICICLETA">
+                                Bicicleta
+                            </option>
+
+                            <option value="ACCESORIO">
+                                Componente o accesorio
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Cantidad
+                        </label>
+
+                        <input type="number"
+                               id="cantidad"
+                               name="cantidad"
+                               min="1"
+                               value="1"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="col-12">
+
+                        <label class="form-label">
+                            Producto disponible
+                        </label>
+
+                        <select id="producto"
+                                name="productoId"
+                                class="form-select"
+                                required>
+
+                            <option th:each="b : ${bicicletas}"
+                                    data-tipo="BICICLETA"
+                                    th:value="${b.idBicicleta}"
+                                    th:text="${b.marca + ' ' +
+                                        b.modelo + ' - ₡' +
+                                        b.precio}">
+                            </option>
+
+                            <option th:each="a : ${accesorios}"
+                                    th:if="${a.cantidad > 0}"
+                                    data-tipo="ACCESORIO"
+                                    th:value="${a.idAccesorio}"
+                                    th:text="${a.descripcion +
+                                        ' - Stock: ' +
+                                        a.cantidad +
+                                        ' - ₡' + a.precio}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Registrar venta
+                        </button>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="card p-4">
+
+                <h5>Historial de ventas</h5>
+
+                <div class="table-responsive">
+
+                    <table class="table table-striped">
+
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Comprobante</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="v : ${ventas}">
+
+                                <td th:text="${v.id}"></td>
+
+                                <td th:text="${#temporals.format(
+                                    v.fecha,
+                                    'dd/MM/yyyy HH:mm')}">
+                                </td>
+
+                                <td th:text="${v.cliente.nombre}">
+                                </td>
+
+                                <td th:text="${'₡' + v.total}">
+                                </td>
+
+                                <td>
+                                    <a class="btn btn-outline-primary btn-sm"
+                                       th:href="@{/ventas/{id}/comprobante(id=${v.id})}">
+                                        Ver comprobante
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script th:replace=
+        "~{layout/plantilla :: scripts}">
+</script>
+
+<script>
+function filtrarProductos() {
+
+    const tipo = document.getElementById("tipo").value;
+    const producto = document.getElementById("producto");
+    const cantidad = document.getElementById("cantidad");
+
+    for (const opcion of producto.options) {
+        opcion.hidden = opcion.dataset.tipo !== tipo;
+        opcion.disabled = opcion.dataset.tipo !== tipo;
+    }
+
+    producto.selectedIndex = -1;
+
+    const primera = [...producto.options]
+        .find(opcion => !opcion.disabled);
+
+    if (primera) {
+        primera.selected = true;
+    }
+
+    cantidad.value = 1;
+    cantidad.readOnly = tipo === "BICICLETA";
+}
+
+filtrarProductos();
+</script>
+
+</body>
+</html>

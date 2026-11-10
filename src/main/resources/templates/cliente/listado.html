@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/plantilla :: head}"></head>
+    <body class="d-flex">
+        <div th:replace="~{layout/plantilla :: sidebar('clientes')}"></div>
+
+        <div class="main-content">
+            <header th:replace="~{layout/plantilla :: topbar('Gestión de Clientes')}"></header>
+
+            <main class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Clientes Registrados</h4>
+                        <p class="text-muted small mb-0">Base de datos de clientes del negocio (HU-01).</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCliente">
+                        <i class="fa-solid fa-user-plus me-1"></i> Registrar Cliente
+                    </button>
+                </div>
+
+                <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${exito}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <div class="table-responsive">
+                        <table class="table align-middle text-secondary mb-0">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>#</th>
+                                    <th>Identificación</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo Electrónico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c, i : ${clientes}">
+                                    <td th:text="${i.count}">1</td>
+                                    <td class="fw-bold text-dark" th:text="${c.identificacion}">1-1154-0892</td>
+                                    <td class="text-dark fw-semibold" th:text="${c.nombre}">Juan Pérez</td>
+                                    <td th:text="${c.telefono}">8833-2211</td>
+                                    <td th:text="${c.correo}">juan.perez@gmail.com</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="modal fade" id="modalCliente" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content border-0 shadow">
+                    <form th:action="@{/cliente/guardar}" method="POST" th:object="${cliente}">
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold">Nuevo Cliente</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Nombre Completo</label>
+                                <input type="text" class="form-control" th:field="*{nombre}" required placeholder="Ej: Carlos Vega"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Identificación (Única)</label>
+                                <input type="text" class="form-control" th:field="*{identificacion}" required placeholder="Ej: 1-1550-0123"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Teléfono</label>
+                                <input type="text" class="form-control" th:field="*{telefono}" required placeholder="Ej: 8888-9999"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Correo Electrónico</label>
+                                <input type="email" class="form-control" th:field="*{correo}" required placeholder="Ej: cliente@correo.com"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary btn-sm px-3">Guardar Cliente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script th:replace="~{layout/plantilla :: scripts}"></script>
+    </body>
+</html>
